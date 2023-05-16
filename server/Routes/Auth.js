@@ -9,10 +9,13 @@ const app = express();
 const router = express.Router();
 const generateAuthToken = require('../jwToken');
 // Middleware
+const bodyParser = require('body-parser');
+const stripe = require('stripe')('sk_test_51N6EfUSCtNBWgQI1he8keBsR0dxXEJnMDl6TJk8Se8l66VgglVVqCAzsifpu62MkLwJi5l0wm5J9Ii226S4Up2Wl007eKfuvB4');
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
-
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 // JWT secret
 const jwtSecret = "HaHa";
 // var foodItems= require('../index').foodData;
@@ -190,7 +193,7 @@ router.post('/orderData', async (req, res) => {
     }
 })
 
-router.post('/myOrderData', async (req, res) => {
+router.post('/myOrder', async (req, res) => {
     try {
         console.log(req.body.email)
         let eId = await Order.findOne({ 'email': req.body.email })
@@ -202,5 +205,16 @@ router.post('/myOrderData', async (req, res) => {
     
 
 });
+router.post("/payment", (req, res) => {
+  console.log(req.body);
+
+  const response = {
+    status: "success",
+    message: "Payment has been processed.",
+  };
+
+  res.send(response);
+});
+
 
 module.exports = router
