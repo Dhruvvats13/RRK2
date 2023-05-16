@@ -1,9 +1,13 @@
 import React from 'react'
 import Delete from '@material-ui/icons/Delete'
-import { useCart, useDispatchCart } from './ContextReducer';
+import { useCart, useDispatchCart } from './ContextReducer'
+import { useNavigate } from 'react-router-dom'
+
 export default function Cart() {
-  let data = useCart();
-  let dispatch = useDispatchCart();
+  let data = useCart()
+  let dispatch = useDispatchCart()
+  const navigate = useNavigate()
+
   if (data.length === 0) {
     return (
       <div>
@@ -11,17 +15,10 @@ export default function Cart() {
       </div>
     )
   }
-  // const handleRemove = (index)=>{
-  //   console.log(index)
-  //   dispatch({type:"REMOVE",index:index})
-  // }
 
   const handleCheckOut = async () => {
     let userEmail = localStorage.getItem("userEmail");
-    // console.log(data,localStorage.getItem("userEmail"),new Date())
     let response = await fetch("http://localhost:3001/api/auth/orderData", {
-      // credentials: 'include',
-      // Origin:"http://localhost:3000/login",
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -32,21 +29,19 @@ export default function Cart() {
         order_date: new Date().toDateString()
       })
     });
-    console.log("JSON RESPONSE:::::", response.status)
     if (response.status === 200) {
       dispatch({ type: "DROP" })
     }
   }
 
   let totalPrice = data.reduce((total, food) => total + food.price, 0)
+
   return (
     <div>
-
-      {console.log(data)}
-      <div className='container m-auto mt-5 table-responsive  table-responsive-sm table-responsive-md' >
-        <table className='table table-hover '>
-          <thead className=' text-success fs-4'>
-            <tr>
+      <div className='container m-auto mt-5 table-responsive table-responsive-sm table-responsive-md'>
+        <table className='table '>
+          <thead className=' text-light fs-4'>
+            <tr >
               <th scope='col' >#</th>
               <th scope='col' >Name</th>
               <th scope='col' >Quantity</th>
@@ -55,26 +50,30 @@ export default function Cart() {
               <th scope='col' ></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className=' text-light fs-4'>
             {data.map((food, index) => (
-              <tr>
-                <th scope='row' >{index + 1}</th>
-                <td >{food.name}</td>
+              <tr key={index}>
+                <th scope='row'>{index + 1}</th>
+                <td>{food.name}</td>
                 <td>{food.qty}</td>
                 <td>{food.size}</td>
                 <td>{food.price}</td>
-                <td ><button type="button" className="btn p-0"><Delete onClick={() => { dispatch({ type: "REMOVE", index: index }) }} /></button> </td></tr>
+                <td>
+                  <button type="button" className="btn text-light p-0">
+                    <Delete onClick={() => dispatch({ type: "REMOVE", index: index })} />
+                  </button>
+                </td>
+              </tr>
             ))}
           </tbody>
         </table>
-        <div><h1 className='fs-2'>Total Price: {totalPrice}/-</h1></div>
+        <div><h1 className=' text-light fs-2'>Total Price: {totalPrice}/-</h1></div>
         <div>
-          <button className='btn bg-success mt-5 ' onClick={handleCheckOut} > Check Out </button>
+          <button className='btn bg-light mt-5' onClick={(handleCheckOut) => navigate('/payment')}>
+            Check Out
+          </button>
         </div>
       </div>
-
-
-
     </div>
   )
 }
